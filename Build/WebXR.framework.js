@@ -351,18 +351,30 @@ setTimeout(function () {
         navigator.xr.requestSession('immersive-vr', {
           requiredFeatures: thisXRMananger.gameModule.WebXR.Settings.VRRequiredReferenceSpace,
           optionalFeatures: thisXRMananger.gameModule.WebXR.Settings.VROptionalFeatures
-        }).then(function (session) {
-          session.isImmersive = true;
-          session.isInSession = true;
-          session.isAR = false;
-          thisXRMananger.xrSession = session;
-          thisXRMananger.onSessionStarted(session);
-        }).catch(function (error) {
-          if (thisXRMananger.BrowserObject.resumeAsyncCallbacks) {
-            thisXRMananger.BrowserObject.resumeAsyncCallbacks();
-          }
-          thisXRMananger.BrowserObject.mainLoop.resume();
-        });
+        }).then(async (session) => {
+if (typeof(DeviceOrientationEvent) !== "undefined" && typeof(DeviceOrientationEvent).requestPermission === 'function')
+{
+DeviceOrientationEvent.requestPermission()
+.then(response => {
+if (response === 'granted') {
+session.isImmersive = true;
+session.isInSession = true;
+session.isAR = false;
+thisXRMananger.xrSession = session;
+thisXRMananger.onSessionStarted(session);
+}
+}).catch(function (error) {
+thisXRMananger.BrowserObject.resumeAsyncCallbacks();
+thisXRMananger.BrowserObject.mainLoop.resume();
+});
+} else {
+session.isImmersive = true;
+session.isInSession = true;
+session.isAR = false;
+thisXRMananger.xrSession = session;
+thisXRMananger.onSessionStarted(session);
+}
+});
       }
     
       XRManager.prototype.exitXRSession = function () {
