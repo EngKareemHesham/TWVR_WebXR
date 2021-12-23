@@ -351,23 +351,42 @@ setTimeout(function () {
         navigator.xr.requestSession('immersive-vr', {
           requiredFeatures: thisXRMananger.gameModule.WebXR.Settings.VRRequiredReferenceSpace,
           optionalFeatures: thisXRMananger.gameModule.WebXR.Settings.VROptionalFeatures
-        }).then(function (session) => {
-if (typeof(DeviceOrientationEvent) !== "undefined" && typeof(DeviceOrientationEvent).requestPermission === 'function')
-{
-DeviceOrientationEvent.requestPermission()
-.then(response => {
-if (response === 'granted') {
+        }).then(function (session) {
+		
+		
+		
+		
+		if ( typeof( DeviceMotionEvent ) !== "undefined" && typeof( DeviceMotionEvent.requestPermission ) === "function" )  //means it is iphone or device that doesn't have vr permission
+    {
+    // (optional) Do something before API request prompt.
+    DeviceMotionEvent.requestPermission().then( response => {
+    // (optional) Do something after API prompt dismissed.
+    if ( response == "granted" ) {
+	
 session.isImmersive = true;
 session.isInSession = true;
 session.isAR = false;
 thisXRMananger.xrSession = session;
 thisXRMananger.onSessionStarted(session);
-}
-}).catch(function (error) {
-thisXRMananger.BrowserObject.resumeAsyncCallbacks();
+    }
+    else
+    {
+    alert( "DeviceMotionEvent not Granted, Please clear cache and try again" );
+	session.isImmersive = true;
+session.isInSession = true;
+session.isAR = false;
+thisXRMananger.xrSession = session;
+thisXRMananger.onSessionStarted(session);
+    }
+    }).catch( e => {
+	thisXRMananger.BrowserObject.resumeAsyncCallbacks();
 thisXRMananger.BrowserObject.mainLoop.resume();
-});
-} else {
+    console.error(e);
+    alert( " DeviceMotionEvent error "  + e);
+    } )
+    }
+		else {
+		    alert( "DeviceMotionEvent not Granted, Please clear cache and try again" );
 session.isImmersive = true;
 session.isInSession = true;
 session.isAR = false;
