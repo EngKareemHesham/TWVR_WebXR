@@ -39,7 +39,6 @@ setTimeout(function () {
         this.frameNumber = 0;
         this.touchIDs = [];
         this.touches = [];
-        this.eventsNamesToIDs = {};
         this.CreateTouch = function (pageElement, xPercentage, yPercentage) {
           var touchID = 0;
           while (this.touchIDs.includes(touchID))
@@ -60,9 +59,9 @@ setTimeout(function () {
             return item !== touch
           });
         }
-        this.SendTouchEvent = function(JSEventsObject, eventName, target, changedTouches) {
+        this.SendTouchEvent = function(JSEventsObject, eventID, eventName, target, changedTouches) {
           var touchEvent = new XRTouchEvent(eventName, target, this.touches, this.touches, changedTouches);
-          JSEventsObject.eventHandlers[this.eventsNamesToIDs[eventName]].eventListenerFunc(touchEvent);
+          JSEventsObject.eventHandlers[eventID].eventListenerFunc(touchEvent);
         }
       }
       
@@ -352,47 +351,17 @@ setTimeout(function () {
           requiredFeatures: thisXRMananger.gameModule.WebXR.Settings.VRRequiredReferenceSpace,
           optionalFeatures: thisXRMananger.gameModule.WebXR.Settings.VROptionalFeatures
         }).then(function (session) {
-		
-		
-		
-		
-		if ( typeof( DeviceMotionEvent ) !== "undefined" && typeof( DeviceMotionEvent.requestPermission ) === "function" )  //means it is iphone or device that doesn't have vr permission
-    {
-    // (optional) Do something before API request prompt.
-    DeviceMotionEvent.requestPermission().then( response => {
-    // (optional) Do something after API prompt dismissed.
-    if ( response == "granted" ) {
-	
-session.isImmersive = true;
-session.isInSession = true;
-session.isAR = false;
-thisXRMananger.xrSession = session;
-thisXRMananger.onSessionStarted(session);
-    }
-    else
-    {
-    alert( "DeviceMotionEvent not Granted, Please clear cache and try again" );
-	session.isImmersive = true;
-session.isInSession = true;
-session.isAR = false;
-thisXRMananger.xrSession = session;
-thisXRMananger.onSessionStarted(session);
-    }
-    }).catch( e => {
-	thisXRMananger.BrowserObject.resumeAsyncCallbacks();
-thisXRMananger.BrowserObject.mainLoop.resume();
-    console.error(e);
-    alert( " DeviceMotionEvent error "  + e);
-    } )
-    }
-		else {
-session.isImmersive = true;
-session.isInSession = true;
-session.isAR = false;
-thisXRMananger.xrSession = session;
-thisXRMananger.onSessionStarted(session);
-}
-});
+          session.isImmersive = true;
+          session.isInSession = true;
+          session.isAR = false;
+          thisXRMananger.xrSession = session;
+          thisXRMananger.onSessionStarted(session);
+        }).catch(function (error) {
+          if (thisXRMananger.BrowserObject.resumeAsyncCallbacks) {
+            thisXRMananger.BrowserObject.resumeAsyncCallbacks();
+          }
+          thisXRMananger.BrowserObject.mainLoop.resume();
+        });
       }
     
       XRManager.prototype.exitXRSession = function () {
@@ -435,9 +404,8 @@ thisXRMananger.onSessionStarted(session);
 
         this.gameModule.WebXR.OnEndXR();
         this.didNotifyUnity = false;
-        var pixelRatio = Module.devicePixelRatio || window.devicePixelRatio || 1;
-        this.canvas.width = this.canvas.parentElement.clientWidth * pixelRatio;
-        this.canvas.height = this.canvas.parentElement.clientHeight * pixelRatio;
+        this.canvas.width = this.canvas.parentElement.clientWidth * this.gameModule.asmLibraryArg._JS_SystemInfo_GetPreferredDevicePixelRatio();
+        this.canvas.height = this.canvas.parentElement.clientHeight * this.gameModule.asmLibraryArg._JS_SystemInfo_GetPreferredDevicePixelRatio();
 
         if (this.BrowserObject.pauseAsyncCallbacks) {
           this.BrowserObject.pauseAsyncCallbacks();
@@ -459,7 +427,7 @@ thisXRMananger.onSessionStarted(session);
         {
           var touch = this.xrData.touches[0];
           this.xrData.RemoveTouch(touch);
-          this.xrData.SendTouchEvent(this.JSEventsObject, "touchend", this.canvas, [touch]);
+          this.xrData.SendTouchEvent(this.JSEventsObject, 8, "touchend", this.canvas, [touch]);
         }
       }
       
@@ -524,11 +492,11 @@ thisXRMananger.onSessionStarted(session);
                 break;
               case "selectstart": // 7 touchstart
                 inputSource.xrTouchObject = this.xrData.CreateTouch(this.canvas, xPercentage, yPercentage);
-                this.xrData.SendTouchEvent(this.JSEventsObject, "touchstart", this.canvas, [inputSource.xrTouchObject])
+                this.xrData.SendTouchEvent(this.JSEventsObject, 7, "touchstart", this.canvas, [inputSource.xrTouchObject])
                 break;
               case "selectend": // 8 touchend
                 this.xrData.RemoveTouch(inputSource.xrTouchObject);
-                this.xrData.SendTouchEvent(this.JSEventsObject, "touchend", this.canvas, [inputSource.xrTouchObject]);
+                this.xrData.SendTouchEvent(this.JSEventsObject, 8, "touchend", this.canvas, [inputSource.xrTouchObject]);
                 inputSource.xrTouchObject = null;
                 break;
             }
@@ -600,7 +568,7 @@ thisXRMananger.onSessionStarted(session);
             controller = this.xrData.controllerB;
             break;
         }
-        if (controller && Module.HEAPF32[controller.enabledIndex] == 1 && controller.gamepad && controller.gamepad.hapticActuators && controller.gamepad.hapticActuators.length > 0)
+        if (controller && controller.enabled == 1 && controller.gamepad && controller.gamepad.hapticActuators && controller.gamepad.hapticActuators.length > 0)
         {
           controller.gamepad.hapticActuators[0].pulse(hapticPulseAction.detail.intensity, hapticPulseAction.detail.duration);
         }
@@ -614,9 +582,6 @@ thisXRMananger.onSessionStarted(session);
     
           var thisXRMananger = this;
           this.JSEventsObject = this.gameModule.WebXR.GetJSEventsObject();
-          for (var i = 0; i < this.JSEventsObject.eventHandlers.length; i++) {
-            this.xrData.eventsNamesToIDs[this.JSEventsObject.eventHandlers[i].eventTypeString] = i;
-          }
           this.BrowserObject = this.gameModule.WebXR.GetBrowserObject();
           this.BrowserObject.requestAnimationFrame = function (func) {
             if (thisXRMananger.xrSession && thisXRMananger.xrSession.isInSession) {
@@ -854,7 +819,7 @@ thisXRMananger.onSessionStarted(session);
           }
         }
         if (touchesToSend.length > 0) {
-          this.xrData.SendTouchEvent(this.JSEventsObject, "touchmove", this.canvas, touchesToSend);
+          this.xrData.SendTouchEvent(this.JSEventsObject, 9, "touchmove", this.canvas, touchesToSend);
           for (var i = 0; i < touchesToSend.length; i++) {
             touchesToSend[i].ResetMovement();
           }
