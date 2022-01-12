@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | {{{ PRODUCT_NAME }}}</title>
-    <meta name="description" content="{{{ DESCRIPTION }}}">
+    <title>Unity WebGL Player | TWXR</title>
+    <meta name="description" content="TWXR">
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
@@ -27,7 +27,7 @@
 	var isActive;
 	document.addEventListener('visibilitychange', function () {
 if (document.visibilityState == "hidden") {
-    isActive = setInterval(function() { SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 250);
+    isActive = setInterval(function() { SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 500); //will keep sending this every 500ms (every  0.5 second)
 } else {
     clearInterval(isActive);
     isActive = false;
@@ -37,21 +37,15 @@ if (document.visibilityState == "hidden") {
 	
 	
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+      var loaderUrl = buildUrl + "/WebXR.loader.js";
       var config = {
-        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
-        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
-        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
-#if MEMORY_FILENAME
-        memoryUrl: buildUrl + "/{{{ MEMORY_FILENAME }}}",
-#endif
-#if SYMBOLS_FILENAME
-        symbolsUrl: buildUrl + "/{{{ SYMBOLS_FILENAME }}}",
-#endif
+        dataUrl: buildUrl + "/WebXR.data",
+        frameworkUrl: buildUrl + "/WebXR.framework.js",
+        codeUrl: buildUrl + "/WebXR.wasm",
         streamingAssetsUrl: "StreamingAssets",
-        companyName: "{{{ COMPANY_NAME }}}",
-        productName: "{{{ PRODUCT_NAME }}}",
-        productVersion: "{{{ PRODUCT_VERSION }}}",
+        companyName: "TW",
+        productName: "TWXR",
+        productVersion: "0.1",
       };
 
       var container = document.querySelector("#unity-container");
@@ -61,11 +55,8 @@ if (document.visibilityState == "hidden") {
       var progressBarFull = document.querySelector("#unity-progress-bar-full");
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
       var unityInstance = null;
-      {{{ WEBXR_POLYFILL_CONFIG }}}
+      
 
-#if BACKGROUND_FILENAME
-      canvas.style.background = "url('" + buildUrl + "/{{{ BACKGROUND_FILENAME.replace(/'/g, '%27') }}}') center / cover";
-#endif
       loadingBar.style.display = "block";
 
       var script = document.createElement("script");
