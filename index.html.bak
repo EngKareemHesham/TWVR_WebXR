@@ -23,19 +23,6 @@
     </div>
     <script>
 	
-	//Keeping the photon connection alive even if it is in the background
-	var isActive;
-	document.addEventListener('visibilitychange', function () {
-if (document.visibilityState == "hidden") {
-    isActive = setInterval(function() { SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 500); //will keep sending this every 500ms (every  0.5 second)
-} else {
-    clearInterval(isActive);
-    isActive = false;
-}
-});
-	
-	
-	
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/WebXR.loader.js";
       var config = {
@@ -78,6 +65,21 @@ if (document.visibilityState == "hidden") {
         });
       };
       document.body.appendChild(script);
+	  
+	  	  	//Keeping the photon connection alive even if it is in the background
+	var isActive;
+	document.addEventListener('visibilitychange', function () {
+	if(unityInstance != "none")
+	{
+if (document.visibilityState == "hidden") {
+    isActive = setInterval(function() { SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 500); //will keep sending this every 500ms (every  0.5 second)
+} else {
+    clearInterval(isActive);
+    isActive = false;
+}
+}
+});
+
     </script>
   </body>
 </html>
