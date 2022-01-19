@@ -72,7 +72,7 @@
 	if(unityInstance != null)
 	{
 if (document.visibilityState == "hidden") {
-    isActive = setInterval(function() { unityInstance.SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 500); //will keep sending this every 500ms (every  0.5 second)
+    isActive = setInterval(function() { unityInstance.SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 250); //will keep sending this every 500ms (every  0.5 second)
 } else {
     clearInterval(isActive);
     isActive = false;
