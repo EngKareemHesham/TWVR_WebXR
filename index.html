@@ -31,8 +31,8 @@
                 localStorage.TWpage_available = Date.now();
             }
             if(e.key == "TWpage_available"){
-                //alert("One more page already open");
-				window.close();
+                alert("One more page already open...Please close this one");
+				//window.close();
             }
         };
         window.addEventListener('storage', onLocalStorageEvent, false);

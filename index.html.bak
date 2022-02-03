@@ -22,7 +22,7 @@
       </div>
     </div>
     <script>
-				  	//A script to prevent opening 2 tabs of the same webgl
+		//A script to prevent opening 2 tabs of the same webgl
         // Broadcast that you're opening a page.
         localStorage.TWopenpages = Date.now();
         var onLocalStorageEvent = function(e){
