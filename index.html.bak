@@ -22,7 +22,22 @@
       </div>
     </div>
     <script>
-	
+				  	//A script to prevent opening 2 tabs of the same webgl
+        // Broadcast that you're opening a page.
+        localStorage.TWopenpages = Date.now();
+        var onLocalStorageEvent = function(e){
+            if(e.key == "TWopenpages"){
+                // Listen if anybody else is opening the same page!
+                localStorage.TWpage_available = Date.now();
+            }
+            if(e.key == "TWpage_available"){
+                //alert("One more page already open");
+				window.close();
+            }
+        };
+        window.addEventListener('storage', onLocalStorageEvent, false);
+		
+		
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
       var config = {
@@ -81,7 +96,7 @@
 	if(unityInstance != null)
 	{
 if (document.visibilityState == "hidden") {
-    isActive = setInterval(function() { unityInstance.SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 500); //will keep sending this every 500ms (every  0.5 second)
+    isActive = setInterval(function() { unityInstance.SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 250); //will keep sending this every 500ms (every  0.5 second)
 } else {
     clearInterval(isActive);
     isActive = false;

@@ -22,7 +22,22 @@
       </div>
     </div>
     <script>
-	
+		//A script to prevent opening 2 tabs of the same webgl
+        // Broadcast that you're opening a page.
+        localStorage.TWopenpages = Date.now();
+        var onLocalStorageEvent = function(e){
+            if(e.key == "TWopenpages"){
+                // Listen if anybody else is opening the same page!
+                localStorage.TWpage_available = Date.now();
+            }
+            if(e.key == "TWpage_available"){
+                //alert("One more page already open");
+				window.close();
+            }
+        };
+        window.addEventListener('storage', onLocalStorageEvent, false);
+		
+		
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/XR.loader.js";
       var config = {
