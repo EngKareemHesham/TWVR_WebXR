@@ -31,8 +31,9 @@
                 localStorage.TWpage_available = Date.now();
             }
             if(e.key == "TWpage_available"){
-                //alert("One more page already open");
-				window.close();
+                alert("One more page already open...Please close this one");
+				 unityInstance.SendMessage("WebListener", "AnotherWebGLTabAlreadyOpened");
+				//window.close();
             }
         };
         window.addEventListener('storage', onLocalStorageEvent, false);
@@ -96,7 +97,7 @@
 	if(unityInstance != null)
 	{
 if (document.visibilityState == "hidden") {
-    isActive = setInterval(function() { unityInstance.SendMessage("Manager", "KeepWebGlAliveInTheBackground"); }, 250); //will keep sending this every 500ms (every  0.5 second)
+    isActive = setInterval(function() { unityInstance.SendMessage("WebListener", "KeepWebGlAliveInTheBackground"); }, 250); //will keep sending this every 500ms (every  0.5 second)
 } else {
     clearInterval(isActive);
     isActive = false;
