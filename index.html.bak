@@ -31,7 +31,7 @@
                 localStorage.TWpage_available = Date.now();
             }
             if(e.key == "TWpage_available"){
-                alert("One more page already open...Please close this one");
+                //alert("One more page already open...Please close this one");
 				 unityInstance.SendMessage("WebListener", "AnotherWebGLTabAlreadyOpened");
 				//window.close();
             }
