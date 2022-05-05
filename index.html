@@ -28,12 +28,16 @@
     <script>
 		//A script to prevent opening 2 tabs of the same webgl
         // Broadcast that you're opening a page.
-		var AnotherWebGLTabAlreadyOpened = false;
-        localStorage.TWopenpages = Date.now();
+
+
+var AnotherWebGLTabAlreadyOpened = false;
+       localStorage.TWopenpages = Date.now();
         var onLocalStorageEvent = function(e){
+		console.log("onLocalStorageEvent");
             if(e.key == "TWopenpages"){
                 // Listen if anybody else is opening the same page!
                 localStorage.TWpage_available = Date.now();
+						console.log("onLocalStorageEvent TWpage_available");
             }
             if(e.key == "TWpage_available"){
                 //alert("One more page already open...Please close this one");
@@ -42,8 +46,7 @@
 				//window.close();
             }
         };
-        window.addEventListener('storage', onLocalStorageEvent, false);
-		
+		window.addEventListener('storage', onLocalStorageEvent, false);
 		
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/XR.loader.js";
@@ -71,46 +74,42 @@
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
+	  
+	  if(AnotherWebGLTabAlreadyOpened)
+		  {
+		  alert("Another Take A Walk already opened on another tab...\nPlease close this tab");
+		  }
+	  else
+	  {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((instance) => {
-		
+				loadingBar.style.display = "none";
+
 		function CheckIfUnityFinishedLoading() {
     if(window.gameIsRunning === false) {
 	 console.log("Unity didn't finish loading yet!!");
        window.setTimeout(CheckIfUnityFinishedLoading, 100); /* this checks the flag every 100 milliseconds*/
     } else {
 		 console.log("Unity finished loading");
-                unityInstance = instance;
-		  if(AnotherWebGLTabAlreadyOpened)
-		  {    		 
-
-		  alert("Another Take A Walk already opened on another tab...\nPlease close this tab");
-console.log("Another Take A Walk already opened on another tab...\nPlease close this tab");
-		  unityInstance.Quit(function() {
-});
-unityInstance = null;
-
-		  }
-		  else
-		  {
-		  loadingBar.style.display = "none";
+        unityInstance = instance;
           if (fullscreenButton)
           {
             fullscreenButton.onclick = () => {
               unityInstance.SetFullscreen(1);
             };
           }
-		  }
     }
 }
 
 CheckIfUnityFinishedLoading();
-
         }).catch((message) => {
           alert(message);
         });
+		}
+		
       };
+	  
       document.body.appendChild(script);
 	  
 	  	//Keeping the photon connection alive even if it is in the background
