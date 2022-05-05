@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | TWXR</title>
+    <title>TakeAWalk | TWXR</title>
     <meta name="description" content="TWXR">
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
@@ -74,16 +74,39 @@
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((instance) => {
-          unityInstance = instance;
+		
+		function CheckIfUnityFinishedLoading() {
+    if(window.gameIsRunning === false) {
+	 console.log("Unity didn't finish loading yet!!");
+       window.setTimeout(CheckIfUnityFinishedLoading, 100); /* this checks the flag every 100 milliseconds*/
+    } else {
+		 console.log("Unity finished loading");
+                unityInstance = instance;
 		  if(AnotherWebGLTabAlreadyOpened)
-		  unityInstance.SendMessage("WebListener", "AnotherWebGLTabAlreadyOpened");
-          loadingBar.style.display = "none";
+		  {    		 
+
+		  alert("Another Take A Walk already opened on another tab...\nPlease close this tab");
+console.log("Another Take A Walk already opened on another tab...\nPlease close this tab");
+		  unityInstance.Quit(function() {
+});
+unityInstance = null;
+
+		  }
+		  else
+		  {
+		  loadingBar.style.display = "none";
           if (fullscreenButton)
           {
             fullscreenButton.onclick = () => {
               unityInstance.SetFullscreen(1);
             };
           }
+		  }
+    }
+}
+
+CheckIfUnityFinishedLoading();
+
         }).catch((message) => {
           alert(message);
         });
@@ -103,6 +126,9 @@ if (document.visibilityState == "hidden") {
 }
 }
 });
+
+
+ window.gameIsRunning = false ;//To know when the unity started and then it on my index.html (it is changed by the the serverfunction.jslib and weblistener.cs)
 
     </script>
   </body>
